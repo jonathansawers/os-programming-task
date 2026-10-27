@@ -17,6 +17,8 @@ void my_mergesort(int left, int right){
 
 /* this function will be called by the testing program. */
 void * parallel_mergesort(void *arg){
+	// should call my_mergesort as base case
+	// use pthread here
 		return NULL;
 }
 
