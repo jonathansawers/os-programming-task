@@ -13,6 +13,18 @@ void merge(int leftstart, int leftend, int rightstart, int rightend){
 
 /* this function will be called by parallel_mergesort() as its base case. */
 void my_mergesort(int left, int right){
+	int middle;
+
+	// base case
+	if (left >= right) {
+		return;
+	}
+
+	// sort both halves before merging them
+	middle = left + (right - left) / 2;
+	my_mergesort(left, middle);
+	my_mergesort(middle + 1, right);
+	merge(left, middle, middle + 1, right);
 }
 
 /* this function will be called by the testing program. */
