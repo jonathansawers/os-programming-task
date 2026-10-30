@@ -64,6 +64,22 @@ I built the project from a clean state with `make clean && make`. I then ran the
 
 Each valid case reported that the requested number of elements was sorted. The test program also checks every adjacent pair in the final array, so a successful result means the array was in nondecreasing order.
 
+For performance testing, the supplied program sorted 100,000,000 elements with seed `1234` on an ARM64 macOS machine, using Apple clang 21.0.0. Each cutoff was measured once:
+
+| Cutoff | Sort time (seconds) | Speedup over serial |
+| ---: | ---: | ---: |
+| 0 (serial) | 14.37 | 1.00× |
+| 1 | 7.25 | 1.98× |
+| 2 | 3.87 | 3.71× |
+| 3 | 2.60 | 5.53× |
+| 4 | 2.48 | 5.79× |
+| 5 | 2.63 | 5.46× |
+| 6 | 3.11 | 4.62× |
+| 7 | 2.85 | 5.04× |
+| 8 | 2.60 | 5.53× |
+
+Cutoff 4 was fastest in this run. These are local, single-run results; performance on Gradescope may differ.
+
 ## Known Bugs
 
 The sorting functions use the global arrays `A` and `B`, so they are not re-entrant (can't be called again if they are already running). Two independent sorts running at the same time could overwrite each other's data.
@@ -80,7 +96,9 @@ Jono: A problem I had was understanding how the existing code divides the array 
 
 Nuwin: 
 
-Shahid: 
+Shahid: I implemented the merge step by comparing elements from the two sorted halves, writing the smaller elements to `B`, and copying the result back to `A`. The temporary array prevents unread values from being overwritten.
+
+`buildArgs` initially returned `NULL`, causing a segmentation fault when `parallel_mergesort` accessed the argument. I fixed it by allocating and initialising the structure. The parent frees each child argument after joining the thread. I also added a base case for ranges with at most one element and a serial fallback if thread creation fails. I tested serial and parallel runs and compared the results against `qsort` for sizes 0–257 and cutoffs 0–6.
 
 ## Sources Used
 
