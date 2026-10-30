@@ -1,6 +1,4 @@
-README.template
-
-## Project Number/Title 
+## Parallel Merge Sort
 
 * Authors: Jonathan Sawers, Shahid Hussain, Nuwin Sooriyaarachchi 
 * Group name: Group 10 
