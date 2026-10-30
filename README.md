@@ -76,7 +76,11 @@ The midpoint and copy-length calculations use signed integer arithmetic. An extr
 
 ## Reflection and Self Assessment
 
+Jono: A problem I had was understanding how the existing code divides the array between threads without merging either half before its sorting thread has finished. I researched how `pthread_create` passes a `void *` argument and how `pthread_join` waits for a thread, then used this knowledge to understand why the code avoids sorting errors caused by merging before both halves are ready. The most challenging part was following the thread arguments and understanding where the code stops creating new threads, but it finally clicked when I saw that the two halves can be sorted independently and only need to synchronise before the merge. I checked the code when errors appeared and tested different input sizes, cutoff levels, and seeds to confirm that the final array was sorted correctly. The only errors encountered were issues with my Git tree, and a rebase fixed these. Overall, the testing process went well because of how simple the code was.
 
+Nuwin: 
+
+Shahid: 
 
 ## Sources Used
 
