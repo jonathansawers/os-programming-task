@@ -5,51 +5,80 @@
 
 ## Overview
 
-Concisely explain what the program does. If this exceeds a couple of
-sentences, you're going too far. Generally, you should be pulling this
-right from the project specification. We don't want you to just cut and
-paste, but paraphrase what is stated in the project specification.
+This project implements merge sort using threads. The input array is split into two parts recursively, with separate threads used for the branches until a cutoff level is reached. The remaining work is completed with the normal recursive merge sort, and the program reports the sorting time.
 
 ## Manifest
 
-A listing of source files and other non-generated files, and a brief
-(one-line) explanation of the purpose of each file.
+* `mergesort.c`: Implements merging, sequential merge sort, and parallel merge sort.
+* `mergesort.h`: Declares the sorting functions, shared arrays, cutoff value, and thread arguments.
+* `test-mergesort.c`: Generates test data, starts the sort, checks the result, and reports the time.
+* `Makefile`: Compiles and links the program with pthread support.
+* `README.md`: Provides the project documentation and instructions.
 
 ## Building the project
 
-This section should tell the user how to build your code.  If you are
-delivering a library, where does it need to be installed, or how do you use
-it? Is this an executable, if so, how can a user get up to speed as fast as
-possible?
+From the project directory, run:
+
+```sh
+make
+```
+
+To remove object files, dependency files, and the executable, run:
+
+```sh
+make clean
+```
 
 ## Features and usage
 
-Summarise the main features of your program. It is also appropriate to
-instruct the user how to use your program.
+The program supports:
+
+* sequential merge sort when the cutoff is `0`;
+* parallel sorting with a configurable number of thread levels;
+* automatic fallback to sequential sorting if a thread cannot be created;
+* checking that the final array is sorted; and
+* measuring the elapsed sorting time.
+
+Run the executable with three arguments:
+
+```text
+./test-mergesort <input size> <cutoff level> <seed>
+```
+
+For example:
+
+```sh
+./test-mergesort 10000 4 7
+```
+
+`input size` must be at least `2`. The cutoff level controls how many levels of the recursion are allowed to create threads, and the seed makes the random input repeatable.
 
 ## Testing
 
-This section should detail how you tested your code. Simply stating "I ran
-it a few times and it seems to work" is not sufficient. Your testing needs
-to be detailed here.
+I built the project from a clean state with `make clean && make`. I then ran the following cases:
+
+* `./test-mergesort 2 0 50`, which tested the smallest accepted input and the sequential base case
+* `./test-mergesort 1000 1 100`, which tested a small parallel sort
+* `./test-mergesort 10000 4 89`, which tested a larger input and several thread levels
+* `./test-mergesort` without arguments, which confirmed that the usage message is displayed and the program exits with an error.
+
+Each valid case reported that the requested number of elements was sorted. The test program also checks every adjacent pair in the final array, so a successful result means the array was in nondecreasing order.
 
 ## Known Bugs
 
-List known bugs that you weren't able to fix (or ran out of time to fix).
+The sorting functions use the global arrays `A` and `B`, so they are not re-entrant (can't be called again if they are already running). Two independent sorts running at the same time could overwrite each other's data.
+
+Errors returned by `pthread_join` are ignored. If joining a thread fails, the parent could merge the arrays before that thread has finished.
+
+The functions assume that their argument pointers and index ranges are valid. Passing a `NULL` argument or an invalid range could cause undefined behaviour.
+
+The midpoint and copy-length calculations use signed integer arithmetic. An extremely large or invalid range could overflow these calculations.
 
 ## Reflection and Self Assessment
 
-Discuss the issues you encountered during development and testing. What
-problems did you have? What did you have to research and learn on your own?
-What kinds of errors did you get? How did you fix them?
 
-What parts of the project did you find challenging? Is there anything that
-finally "clicked" for you in the process of working on this project? How well
-did the development and testing process go for you?
 
 ## Sources Used
 
-If you used any sources outside of the textbook, you should list them here. 
-If you looked something up on stackoverflow.com or you use help from AI, and 
-fail to cite it in this section, it will be considered plagiarism and dealt 
-with accordingly. So be safe CITE!
+* The Canvas modules and the supplied starter files.
+* The `pthread_create` and `pthread_join` documentation for thread management.
